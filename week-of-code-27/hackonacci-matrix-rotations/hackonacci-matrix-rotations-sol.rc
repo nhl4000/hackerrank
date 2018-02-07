@@ -1,0 +1,44 @@
+use std::io;
+use std::io::prelude::*;
+
+fn hackonacci(n: u64) -> bool {
+    [1,1,0,1,0,0,1][(n % 7) as usize] == 1
+}
+
+fn main() {
+    let stdin = io::stdin();
+    let mut stdin_it = stdin.lock().lines();
+
+    let (n, q) = {
+        let line = stdin_it.next().unwrap().unwrap();
+        let mut it = line.split_whitespace().map(|x| x.parse::<usize>().unwrap());
+        (it.next().unwrap(), it.next().unwrap())
+    };
+
+    let mut matrix = vec![false; n * n];
+    for i in 0 .. n {
+        for j in i .. n {
+            matrix[i * n + j] = hackonacci(((i + 1) * (j + 1)).pow(2) as u64);
+            matrix[j * n + i] = matrix[i * n + j];
+        }
+    }
+
+    let cell = |i: usize, j: usize| matrix[i * n + j];
+    let cell90 = |i: usize, j: usize| matrix[i + (n - 1 - j) * n];
+    let cell180 = |i: usize, j: usize| matrix[(n - 1 - i) * n + (n - 1 - j)];
+    let cell270 = |i: usize, j: usize| matrix[(n - 1 - i) + j * n];
+
+    let (mut cnt90, mut cnt180, mut cnt270) = (0, 0, 0);
+    for i in 0 .. n {
+        for j in 0 .. n {
+            if cell(i, j) != cell90(i, j) { cnt90 += 1; }
+            if cell(i, j) != cell180(i, j) { cnt180 += 1; }
+            if cell(i, j) != cell270(i, j) { cnt270 += 1; }
+        }
+    }
+
+    for _ in 0 .. q {
+        let angle = stdin_it.next().unwrap().unwrap().parse::<u32>().unwrap() % 360;
+        println!("{}", match angle { 90 => cnt90, 180 => cnt180, 270 => cnt270, _ => 0 });
+    }
+}
