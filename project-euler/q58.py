@@ -72,7 +72,7 @@ def isPrime(n, k):
     while (d % 2 == 0): 
         d //= 2
     # Iterate given nber of 'k' times 
-    for i in range(k): 
+    for _ in range(k): 
         if (miillerTest(d, n) == False): 
             return False
     return True
